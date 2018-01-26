@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+	typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+	targetNamespace="http://www.activiti.org/bpmn2.0">
+
+	<process id="simple" name="SimpleProcess" isExecutable="true">
+
+		<startEvent id="startSimple" name="Start"
+			activiti:initiator="initiator"></startEvent>
+
+		<sequenceFlow id="flow1" sourceRef="startSimple"
+			targetRef="enterRootDirectory"></sequenceFlow>
+
+		<userTask id="enterRootDirectory" name="Enter Root Directory"
+			activiti:assignee="${initiator}" activiti:candidateGroups="managers">
+			<extensionElements>
+				<activiti:formProperty id="rootDir" name="Root Directory"
+					type="string" required="true"></activiti:formProperty>
+			</extensionElements>
+		</userTask>
+
+		<sequenceFlow id="flow2" sourceRef="enterRootDirectory"
+			targetRef="sigw" />
+
+		<serviceTask id="sigw" name="Delegate to Spring Integration"
+			activiti:delegateExpression="#{gateway}" />
+
+		<sequenceFlow id="flow3" sourceRef="sigw" targetRef="confirmMovementTask" />
+
+		<scriptTask id="confirmMovementTask" name="Execute script"
+			scriptFormat="groovy">
+			<script>
+				println 'Moving on!'
+			</script>
+		</scriptTask>
+
+		<sequenceFlow id="flow4" sourceRef="confirmMovementTask"
+			targetRef="theEnd" />
+
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>
