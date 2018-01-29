@@ -1,4 +1,4 @@
-package li.spectrum.ingestion;
+package li.spectrum.ingestion.integration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

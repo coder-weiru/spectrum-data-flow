@@ -10,18 +10,7 @@
 			activiti:initiator="initiator"></startEvent>
 
 		<sequenceFlow id="flow1" sourceRef="startSimple"
-			targetRef="enterRootDirectory"></sequenceFlow>
-
-		<userTask id="enterRootDirectory" name="Enter Root Directory"
-			activiti:assignee="${initiator}" activiti:candidateGroups="managers">
-			<extensionElements>
-				<activiti:formProperty id="rootDir" name="Root Directory"
-					type="string" required="true"></activiti:formProperty>
-			</extensionElements>
-		</userTask>
-
-		<sequenceFlow id="flow2" sourceRef="enterRootDirectory"
-			targetRef="sigw" />
+			targetRef="sigw"></sequenceFlow>
 
 		<serviceTask id="sigw" name="Delegate to Spring Integration"
 			activiti:delegateExpression="#{gateway}" />

@@ -1,24 +1,19 @@
 package li.spectrum.ingestion;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class SpectrumApplication {
+
+	private static Logger logger = LoggerFactory.getLogger(SpectrumApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpectrumApplication.class, args);
@@ -43,6 +38,7 @@ public class SpectrumApplication {
 		};
 	}
 
+	/*
 	@Bean
 	public CommandLineRunner init(final RepositoryService repositoryService, final RuntimeService runtimeService,
 			final TaskService taskService) {
@@ -51,15 +47,13 @@ public class SpectrumApplication {
 			@Override
 			public void run(String... strings) throws Exception {
 				Map<String, Object> variables = new HashMap<String, Object>();
-				variables.put("applicantName", "John Doe");
-				variables.put("email", "john.doe@activiti.com");
-				variables.put("phoneNumber", "123456789");
+				variables.put("rootDirectory", "C:/Data");
 
 				Deployment deployment = repositoryService.createDeployment()
 						.addClasspathResource("processes/simple.bpmn20.xml").deploy();
 				ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
 						.deploymentId(deployment.getId()).singleResult();
-				System.out.println("Found process definition [" + processDefinition.getName() + "] with id ["
+				logger.info("Found process definition [" + processDefinition.getName() + "] with id ["
 						+ processDefinition.getId() + "]");
 
 				runtimeService.startProcessInstanceByKey("simple", variables);
@@ -67,4 +61,6 @@ public class SpectrumApplication {
 		};
 
 	}
+	*/
+
 }
