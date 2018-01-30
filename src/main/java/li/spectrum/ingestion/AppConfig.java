@@ -8,6 +8,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import li.spectrum.ingestion.dbclient.DocumentService;
+import li.spectrum.ingestion.dbclient.MarkLogicDocumentService;
+import li.spectrum.ingestion.service.ListFileDelegate;
+
 @Configuration
 public class AppConfig {
 
@@ -24,4 +28,13 @@ public class AppConfig {
 		return cfg.buildProcessEngine();
 	}
 
+	@Bean
+	ListFileDelegate listFile() {
+		return new ListFileDelegate(documentService());
+	}
+
+	@Bean
+	DocumentService documentService() {
+		return new MarkLogicDocumentService();
+	}
 }

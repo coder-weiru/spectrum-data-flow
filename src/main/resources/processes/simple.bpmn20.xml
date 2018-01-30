@@ -10,22 +10,12 @@
 			activiti:initiator="initiator"></startEvent>
 
 		<sequenceFlow id="flow1" sourceRef="startSimple"
-			targetRef="sigw"></sequenceFlow>
+			targetRef="listFileUnderDirectory"></sequenceFlow>
 
-		<serviceTask id="sigw" name="Delegate to Spring Integration"
-			activiti:delegateExpression="#{gateway}" />
+		<serviceTask id="listFileUnderDirectory" name="Delegate to list all files under a directory"
+			activiti:delegateExpression="#{listFile}" />
 
-		<sequenceFlow id="flow3" sourceRef="sigw" targetRef="confirmMovementTask" />
-
-		<scriptTask id="confirmMovementTask" name="Execute script"
-			scriptFormat="groovy">
-			<script>
-				println 'Moving on!'
-			</script>
-		</scriptTask>
-
-		<sequenceFlow id="flow4" sourceRef="confirmMovementTask"
-			targetRef="theEnd" />
+		<sequenceFlow id="flow2" sourceRef="listFileUnderDirectory" targetRef="theEnd" />
 
 		<endEvent id="theEnd" />
 

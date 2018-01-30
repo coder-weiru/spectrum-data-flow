@@ -1,6 +1,7 @@
 package li.spectrum.ingestion;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
@@ -12,9 +13,14 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import li.spectrum.ingestion.model.Proc;
 
 @RestController
 class ProcessStartController {
@@ -24,8 +30,9 @@ class ProcessStartController {
 	@Autowired
 	private ProcessEngine processEngine;
 
-	@RequestMapping(method = RequestMethod.GET, value = "/start")
-	Map<String, String> launch() {
+	@RequestMapping(value = "/start", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	Map<String, String> launch(@RequestBody Proc proc) {
 		String pName = processEngine.getName();
 		String ver = ProcessEngine.VERSION;
 		logger.info("ProcessEngine [" + pName + "] Version: [" + ver + "]");
@@ -39,7 +46,11 @@ class ProcessStartController {
 				+ processDefinition.getId() + "]");
 
 		RuntimeService runtimeService = processEngine.getRuntimeService();
-		ProcessInstance asyncProcess = runtimeService.startProcessInstanceByKey("simple");
+
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("rootDir", proc.getRootDir());
+
+		ProcessInstance asyncProcess = runtimeService.startProcessInstanceByKey("simple", variables);
 		return Collections.singletonMap("executionId", asyncProcess.getId());
 	}
 }
