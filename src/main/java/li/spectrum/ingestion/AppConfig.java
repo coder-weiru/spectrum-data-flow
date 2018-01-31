@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import li.spectrum.ingestion.dbclient.DocumentService;
+import li.spectrum.ingestion.dbclient.FileModelService;
 import li.spectrum.ingestion.dbclient.MarkLogicDocumentService;
+import li.spectrum.ingestion.dbclient.MarkLogicFileModelService;
 import li.spectrum.ingestion.dbclient.MarkLogicProcessService;
 import li.spectrum.ingestion.dbclient.ProcessService;
 import li.spectrum.ingestion.service.ListFileDelegate;
@@ -39,7 +41,7 @@ public class AppConfig {
 
 	@Bean
 	TikaExtractionDelegate tika() throws TikaException {
-		return new TikaExtractionDelegate(processService(), tikaExtractor());
+		return new TikaExtractionDelegate(processService(), fileModelService(), tikaExtractor());
 	}
 
 	@Bean
@@ -50,6 +52,11 @@ public class AppConfig {
 	@Bean
 	ProcessService processService() {
 		return new MarkLogicProcessService();
+	}
+
+	@Bean
+	FileModelService fileModelService() {
+		return new MarkLogicFileModelService();
 	}
 
 	@Bean

@@ -23,7 +23,7 @@ public class TikaExtractor {
 		this.tikaParser = tikaParser;
 	}
 
-	public TikaDocument extract(InputStream payload) {
+	public TikaDocument extract(InputStream payload) throws TikaException {
 		logger.debug("Extracting payload: " + payload.toString());
 
 		BodyContentHandler handler = new BodyContentHandler();
@@ -31,8 +31,11 @@ public class TikaExtractor {
 
 		try {
 			tikaParser.parse(payload, metadata, handler);
-		} catch (IOException | SAXException | TikaException e) {
-			e.printStackTrace();
+		} catch (TikaException e) {
+			throw e;
+		} catch (IOException | SAXException e) {
+			logger.error("Error extracting file metadata using Tika, nested exception: ", e);
+			throw new TikaException(e.getMessage(), e);
 		}
 
 		// getting the content of the document
@@ -52,4 +55,6 @@ public class TikaExtractor {
 
 		return document;
 	}
+
+
 }

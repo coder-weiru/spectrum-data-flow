@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marklogic.client.pojo.PojoRepository;
 
+import li.spectrum.ingestion.model.FileModel;
 import li.spectrum.ingestion.model.Proc;
 import li.spectrum.ingestion.security.ClientRole;
 
@@ -49,14 +50,26 @@ public class DatabaseContext {
 	
 	/**
 	 * This repository object manages operations for the Proc POJO Class.
-	 * Generally accessed through calls to the DocumentService, which mediates
+	 * Generally accessed through calls to the ProcessService, which mediates
 	 * and limits some of the access.
 	 * 
-	 * @return A PojoRepository object to manage Documents.
+	 * @return A PojoRepository object to manage processes.
 	 */
 	@Bean
 	public PojoRepository<Proc, String> processRepository() {
 		return clients().get(ClientRole.DOCUMENT_WRITER).newPojoRepository(Proc.class, String.class);
+	}
+
+	/**
+	 * This repository object manages operations for the FileModel POJO Class.
+	 * Generally accessed through calls to the FileModelService, which mediates
+	 * and limits some of the access.
+	 * 
+	 * @return A PojoRepository object to manage file models.
+	 */
+	@Bean
+	public PojoRepository<FileModel, String> fileModelRepository() {
+		return clients().get(ClientRole.DOCUMENT_WRITER).newPojoRepository(FileModel.class, String.class);
 	}
 
 	/**
