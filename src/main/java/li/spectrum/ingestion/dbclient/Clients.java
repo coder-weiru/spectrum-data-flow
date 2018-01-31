@@ -7,7 +7,7 @@ import org.springframework.core.env.Environment;
 
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory;
-import com.marklogic.client.DatabaseClientFactory.Authentication;
+import com.marklogic.client.DatabaseClientFactory.DigestAuthContext;
 
 import li.spectrum.ingestion.security.ClientRole;
 
@@ -43,6 +43,7 @@ public class Clients extends HashMap<ClientRole, DatabaseClient> {
 		Integer port = Integer.parseInt(env.getProperty("marklogic.rest.port"));
 		String username = env.getProperty(role.getUserParam());
 		String password = env.getProperty(role.getPasswordParam());
-		return DatabaseClientFactory.newClient(host, port, username, password, Authentication.DIGEST);
+
+		return DatabaseClientFactory.newClient(host, port, new DigestAuthContext(username, password));
 	}
 }
