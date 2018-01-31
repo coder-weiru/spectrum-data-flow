@@ -3,10 +3,10 @@ package li.spectrum.ingestion.dbclient;
 import com.marklogic.client.pojo.annotation.Id;
 
 public class Document {
-	@Id
 	/**
 	 * The String identifier for this user, a primary key.
 	 */
+	@Id
 	public String id;
 
 	private String content;

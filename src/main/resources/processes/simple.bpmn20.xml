@@ -15,8 +15,13 @@
 		<serviceTask id="listFileUnderDirectory" name="Delegate to list all files under a directory"
 			activiti:delegateExpression="#{listFile}" />
 
-		<sequenceFlow id="flow2" sourceRef="listFileUnderDirectory" targetRef="theEnd" />
+		<sequenceFlow id="flow2" sourceRef="listFileUnderDirectory" targetRef="extractTikaEntities" />
 
+		<serviceTask id="extractTikaEntities" name="Delegate to extract the file metadata using tika extractor library"
+			activiti:delegateExpression="#{tika}" />
+
+		<sequenceFlow id="flow3" sourceRef="extractTikaEntities" targetRef="theEnd" />
+		
 		<endEvent id="theEnd" />
 
 	</process>

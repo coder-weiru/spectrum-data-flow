@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.marklogic.client.ResourceNotFoundException;
 import com.marklogic.client.pojo.PojoRepository;
 
 /**
@@ -29,26 +30,35 @@ public class MarkLogicDocumentService extends MarkLogicBaseService implements Do
 	}
 
 	@Override
+	public Document get(String docId) {
+		try {
+			return repository.read(docId);
+		} catch (ResourceNotFoundException ex) {
+			return null;
+		}
+	}
+
+	@Override
 	public Document add(String id, InputStream content, String collectionName) {
 
-		logger.info("Adding RDF document {}", id);
+		logger.info("Adding document {}", id);
 		Document doc = null;
 		try {
-		String documentUri = MarkLogicDocumentService.uriFromId(collectionName, id);
+			String documentUri = MarkLogicDocumentService.uriFromId(collectionName, id);
 
-		BufferedReader buf = new BufferedReader(new InputStreamReader(content));
-		String line = buf.readLine();
-		StringBuilder sb = new StringBuilder();
-		while (line != null) {
-			sb.append(line).append("\n");
-			line = buf.readLine();
-		}
-		String contentAsString = sb.toString();
-		System.out.println("Contents : " + contentAsString);
+			BufferedReader buf = new BufferedReader(new InputStreamReader(content));
+			String line = buf.readLine();
+			StringBuilder sb = new StringBuilder();
+			while (line != null) {
+				sb.append(line).append("\n");
+				line = buf.readLine();
+			}
+			String contentAsString = sb.toString();
+			logger.debug("Contents : " + contentAsString);
 
 			doc = new Document(documentUri, contentAsString);
 			repository.write(doc, collectionName);
-		
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
