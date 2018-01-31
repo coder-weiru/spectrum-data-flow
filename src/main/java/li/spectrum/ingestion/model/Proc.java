@@ -10,7 +10,9 @@ public class Proc {
 	public String id;
 	private String rootDir;
 	private String timestamp;
-	private List<String> files = new ArrayList<String>();
+	private List<File> files = new ArrayList<File>();
+	private int totalFileCount;
+	private Processing processing;
 
 	public String getId() {
 		return id;
@@ -28,16 +30,20 @@ public class Proc {
 		this.timestamp = timestamp;
 	}
 
-	public List<String> getFiles() {
+	public List<File> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<String> files) {
+	public void setFiles(List<File> files) {
 		this.files = files;
 	}
 
-	public boolean addFile(String filePath) {
-		return this.files.add(filePath);
+	public boolean addFile(File file) {
+		return this.files.add(file);
+	}
+
+	public boolean addDir(Dir dir) {
+		return this.files.add(dir);
 	}
 
 	public String getRootDir() {
@@ -46,6 +52,22 @@ public class Proc {
 
 	public void setRootDir(String rootDir) {
 		this.rootDir = rootDir;
+	}
+
+	public Processing getProcessing() {
+		return processing;
+	}
+
+	public void setProcessing(Processing processing) {
+		this.processing = processing;
+	}
+
+	public long getTotalFileCount() {
+		return totalFileCount;
+	}
+
+	public void setTotalFileCount(int totalFileCount) {
+		this.totalFileCount = totalFileCount;
 	}
 
 }

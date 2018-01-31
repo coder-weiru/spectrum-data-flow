@@ -1,6 +1,5 @@
 package li.spectrum.ingestion.service;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +15,7 @@ import org.springframework.util.Assert;
 
 import li.spectrum.ingestion.dbclient.FileModelService;
 import li.spectrum.ingestion.dbclient.ProcessService;
+import li.spectrum.ingestion.model.File;
 import li.spectrum.ingestion.model.FileModel;
 import li.spectrum.ingestion.model.Proc;
 import li.spectrum.ingestion.model.Processing;
@@ -65,33 +65,38 @@ public class TikaExtractionDelegate implements JavaDelegate {
 		logger.debug("Continuing process: [" + procId + "]");
 
 		Proc proc = processService.get(procId);
-		List<String> fileNames = proc.getFiles();
-		File file = null;
+		List<File> files = proc.getFiles();
+		java.io.File file = null;
 		TikaDocument tikaDoc = null;
 		Processing processing = null;
-		for (String f : fileNames) {
-			file = new File(f);
+		for (File f : files) {
 			processing = new Processing();
 			processing.setTaskName(this.getClass().getSimpleName());
-			InputStream targetStream = null;
-			try {
-				targetStream = new FileInputStream(file);
-				tikaDoc = this.tikaExtractor.extract(targetStream);
-				if (targetStream != null) {
-					targetStream.close();
-				}
-				processing.setStatus("OK");
-			} catch (TikaException | IOException e) {
-				logger.error("Error extracting file {}, skipping it.", f);
-				processing.setException(e);
-				processing.setStatus("WARN");
-			}
 
-			logger.debug("Tika extracted: [" + tikaDoc.getMetadata() + "]");
 			FileModel fm = new FileModel();
 			fm.setProcessing(processing);
-			fm.setFilePath(f);
-			fm.setTikaDocument(tikaDoc);
+			fm.setFilePath(f.getPath());
+
+			InputStream targetStream = null;
+			file = new java.io.File(f.getPath());
+			if (file.isFile()) {
+				try {
+					targetStream = new FileInputStream(file);
+					tikaDoc = this.tikaExtractor.extract(targetStream);
+					if (targetStream != null) {
+						targetStream.close();
+					}
+					processing.setStatus("OK");
+				} catch (TikaException | IOException e) {
+					logger.error("Error extracting file {}, skipping it.", f);
+					processing.setException(e);
+					processing.setStatus("WARN");
+				}
+				logger.debug("Tika extracted: [" + tikaDoc.getMetadata() + "]");
+				fm.setTikaDocument(tikaDoc);
+
+			}
+
 			this.fileModelService.add(fm);
 
 		}

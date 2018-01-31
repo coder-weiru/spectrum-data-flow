@@ -1,6 +1,10 @@
 package li.spectrum.ingestion.service;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import li.spectrum.ingestion.dbclient.ProcessService;
+import li.spectrum.ingestion.model.Dir;
+import li.spectrum.ingestion.model.File;
 import li.spectrum.ingestion.model.Proc;
+import li.spectrum.ingestion.model.Processing;
 import li.spectrum.ingestion.utils.IdGenerator;
 
 /**
@@ -53,28 +60,43 @@ public class ListFileDelegate implements JavaDelegate {
 		proc.setRootDir(rootDir);
 		proc.setTimestamp(timestampId);
 
-		proc.setFiles(listFile(rootDir));
+		Processing processing = new Processing();
+		processing.setTaskName(this.getClass().getSimpleName());
+
+		try {
+			List<File> toProcess = listFile(rootDir);
+			proc.setFiles(toProcess);
+			proc.setTotalFileCount(toProcess.size());
+
+		} catch (IOException e) {
+			logger.error("Error listing file {}.", e);
+			processing.setException(e);
+			processing.setStatus("ERROR");
+		}
+
+		proc.setProcessing(processing);
 
 		this.processService.add(proc);
 
 		execution.setVariable("processId", id);
 	}
 
-	private List<String> listFile(String dirPath) {
-		File f = new File(dirPath);
-		File[] files = f.listFiles();
-		List<String> pathes = new ArrayList<String>();
-		if (files != null)
-			for (int i = 0; i < files.length; i++) {
-				File file = files[i];
-
-				if (file.isDirectory()) {
-					pathes.addAll(listFile(file.getAbsolutePath()));
-				} else {
-					pathes.add(file.getAbsolutePath());
-				}
+	private List<File> listFile(String dirPath) throws IOException {
+		List<File> list = new ArrayList<File>();
+		Dir rootDir = new Dir(dirPath);
+		list.add(rootDir);
+		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(dirPath));
+		for (Path path : directoryStream) {
+			if (path.toFile().isDirectory()) {
+				rootDir.setDirCount(rootDir.getDirCount() + 1);
+				list.addAll(listFile(path.toString()));
+			} else {
+				rootDir.setFileCount(rootDir.getFileCount() + 1);
+				File file = new File(path.toString());
+				list.add(file);
 			}
-		return pathes;
+		}
+		return list;
 	}
 
 }
