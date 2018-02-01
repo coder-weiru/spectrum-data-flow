@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import li.spectrum.ingestion.dbclient.DocumentService;
-import li.spectrum.ingestion.dbclient.FileModelService;
-import li.spectrum.ingestion.dbclient.MarkLogicDocumentService;
-import li.spectrum.ingestion.dbclient.MarkLogicFileModelService;
-import li.spectrum.ingestion.dbclient.MarkLogicProcessService;
-import li.spectrum.ingestion.dbclient.ProcessService;
+import li.spectrum.data.dbclient.DocumentService;
+import li.spectrum.data.dbclient.FileModelService;
+import li.spectrum.data.dbclient.MarkLogicDocumentService;
+import li.spectrum.data.dbclient.MarkLogicFileModelService;
+import li.spectrum.data.dbclient.MarkLogicProcessService;
+import li.spectrum.data.dbclient.ProcessService;
 import li.spectrum.ingestion.service.ListFileDelegate;
 import li.spectrum.ingestion.service.TikaExtractionDelegate;
 import li.spectrum.ingestion.tika.TikaExtractor;

@@ -13,13 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-import li.spectrum.ingestion.dbclient.FileModelService;
-import li.spectrum.ingestion.dbclient.ProcessService;
-import li.spectrum.ingestion.model.File;
-import li.spectrum.ingestion.model.FileModel;
-import li.spectrum.ingestion.model.Proc;
-import li.spectrum.ingestion.model.Processing;
-import li.spectrum.ingestion.tika.TikaDocument;
+import li.spectrum.data.dbclient.FileModelService;
+import li.spectrum.data.dbclient.ProcessService;
+import li.spectrum.data.model.File;
+import li.spectrum.data.model.FileModel;
+import li.spectrum.data.model.Proc;
+import li.spectrum.data.model.Processing;
+import li.spectrum.data.model.TikaDocument;
 import li.spectrum.ingestion.tika.TikaExtractor;
 import li.spectrum.ingestion.tika.TikaParser;
 

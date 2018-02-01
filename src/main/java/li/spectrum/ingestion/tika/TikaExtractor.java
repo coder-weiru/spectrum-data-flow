@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
+import li.spectrum.data.model.TikaDocument;
+
 public class TikaExtractor {
 
 	private static Logger logger = LoggerFactory.getLogger(TikaExtractor.class);

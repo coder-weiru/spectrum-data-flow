@@ -26,6 +26,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>li.spectrum.data</groupId>
+			<artifactId>spectrum-data</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-engine</artifactId>
 			<version>6.0.0</version>
