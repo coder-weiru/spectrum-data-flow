@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import li.spectrum.data.dbclient.ProcessService;
-import li.spectrum.data.model.Dir;
 import li.spectrum.data.model.File;
+import li.spectrum.data.model.Folder;
 import li.spectrum.data.model.Proc;
 import li.spectrum.data.model.Processing;
 import li.spectrum.data.utils.IdGenerator;
@@ -83,12 +83,12 @@ public class ListFileDelegate implements JavaDelegate {
 
 	private List<File> listFile(String dirPath) throws IOException {
 		List<File> list = new ArrayList<File>();
-		Dir rootDir = new Dir(dirPath);
+		Folder rootDir = new Folder(dirPath);
 		list.add(rootDir);
 		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(dirPath));
 		for (Path path : directoryStream) {
 			if (path.toFile().isDirectory()) {
-				rootDir.setDirCount(rootDir.getDirCount() + 1);
+				rootDir.setFolderCount(rootDir.getFolderCount() + 1);
 				list.addAll(listFile(path.toString()));
 			} else {
 				rootDir.setFileCount(rootDir.getFileCount() + 1);

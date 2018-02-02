@@ -7,8 +7,10 @@ import org.apache.tika.exception.TikaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
+import li.spectrum.data.dbclient.DatabaseContext;
 import li.spectrum.data.dbclient.DocumentService;
 import li.spectrum.data.dbclient.FileModelService;
 import li.spectrum.data.dbclient.MarkLogicDocumentService;
@@ -21,6 +23,7 @@ import li.spectrum.ingestion.tika.TikaExtractor;
 import li.spectrum.ingestion.tika.TikaParser;
 
 @Configuration
+@Import(DatabaseContext.class)
 public class AppConfig {
 	@Autowired
 	Environment environment;

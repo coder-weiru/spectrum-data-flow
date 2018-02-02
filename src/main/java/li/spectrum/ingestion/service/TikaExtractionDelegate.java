@@ -19,7 +19,7 @@ import li.spectrum.data.model.File;
 import li.spectrum.data.model.FileModel;
 import li.spectrum.data.model.Proc;
 import li.spectrum.data.model.Processing;
-import li.spectrum.data.model.TikaDocument;
+import li.spectrum.data.model.TikaModel;
 import li.spectrum.ingestion.tika.TikaExtractor;
 import li.spectrum.ingestion.tika.TikaParser;
 
@@ -67,7 +67,7 @@ public class TikaExtractionDelegate implements JavaDelegate {
 		Proc proc = processService.get(procId);
 		List<File> files = proc.getFiles();
 		java.io.File file = null;
-		TikaDocument tikaDoc = null;
+		TikaModel tika = null;
 		Processing processing = null;
 		for (File f : files) {
 			processing = new Processing();
@@ -75,14 +75,14 @@ public class TikaExtractionDelegate implements JavaDelegate {
 
 			FileModel fm = new FileModel();
 			fm.setProcessing(processing);
-			fm.setFilePath(f.getPath());
+			fm.setFilePath(f.getCanonicalPath());
 
 			InputStream targetStream = null;
-			file = new java.io.File(f.getPath());
+			file = new java.io.File(f.getCanonicalPath());
 			if (file.isFile()) {
 				try {
 					targetStream = new FileInputStream(file);
-					tikaDoc = this.tikaExtractor.extract(targetStream);
+					tika = this.tikaExtractor.extract(targetStream);
 					if (targetStream != null) {
 						targetStream.close();
 					}
@@ -92,8 +92,8 @@ public class TikaExtractionDelegate implements JavaDelegate {
 					processing.setException(e);
 					processing.setStatus("WARN");
 				}
-				logger.debug("Tika extracted: [" + tikaDoc.getMetadata() + "]");
-				fm.setTikaDocument(tikaDoc);
+				logger.debug("Tika extracted: [" + tika.getMetadata() + "]");
+				fm.setTikaModel(tika);
 
 			}
 

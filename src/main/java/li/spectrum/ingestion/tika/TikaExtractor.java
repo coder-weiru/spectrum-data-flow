@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
-import li.spectrum.data.model.TikaDocument;
+import li.spectrum.data.model.TikaModel;
 
 public class TikaExtractor {
 
@@ -25,7 +25,7 @@ public class TikaExtractor {
 		this.tikaParser = tikaParser;
 	}
 
-	public TikaDocument extract(InputStream payload) throws TikaException {
+	public TikaModel extract(InputStream payload) throws TikaException {
 		logger.debug("Extracting payload: " + payload.toString());
 
 		BodyContentHandler handler = new BodyContentHandler();
@@ -45,7 +45,7 @@ public class TikaExtractor {
 
 		// logger.debug("Contents of the document :" + doc);
 
-		TikaDocument document = new TikaDocument();
+		TikaModel document = new TikaModel();
 
 		// getting metadata of the document
 		// logger.info("Metadata of the document:");
