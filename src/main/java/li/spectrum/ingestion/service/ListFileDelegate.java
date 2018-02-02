@@ -84,6 +84,7 @@ public class ListFileDelegate implements JavaDelegate {
 	private List<File> listFile(String dirPath) throws IOException {
 		List<File> list = new ArrayList<File>();
 		Folder rootDir = new Folder(dirPath);
+		rootDir.setName(Paths.get(dirPath).getFileName().toString());
 		list.add(rootDir);
 		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(dirPath));
 		for (Path path : directoryStream) {
@@ -93,9 +94,11 @@ public class ListFileDelegate implements JavaDelegate {
 			} else {
 				rootDir.setFileCount(rootDir.getFileCount() + 1);
 				File file = new File(path.toString());
+				file.setName(path.getFileName().toString());
 				list.add(file);
 			}
 		}
+		rootDir.setItemCount(rootDir.getFolderCount() + rootDir.getFileCount());
 		return list;
 	}
 

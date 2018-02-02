@@ -17,6 +17,7 @@ import li.spectrum.data.dbclient.FileModelService;
 import li.spectrum.data.dbclient.ProcessService;
 import li.spectrum.data.model.File;
 import li.spectrum.data.model.FileModel;
+import li.spectrum.data.model.Metadata;
 import li.spectrum.data.model.Proc;
 import li.spectrum.data.model.Processing;
 import li.spectrum.data.model.TikaModel;
@@ -72,6 +73,10 @@ public class TikaExtractionDelegate implements JavaDelegate {
 		for (File f : files) {
 			processing = new Processing();
 			processing.setTaskName(this.getClass().getSimpleName());
+
+			Metadata meta = f.get_metadata();
+			meta.setType(f.getClass().getSimpleName());
+			meta.setUri(f.getCanonicalPath());
 
 			FileModel fm = new FileModel();
 			fm.setFile(f);
