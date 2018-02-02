@@ -74,6 +74,7 @@ public class TikaExtractionDelegate implements JavaDelegate {
 			processing.setTaskName(this.getClass().getSimpleName());
 
 			FileModel fm = new FileModel();
+			fm.setFile(f);
 			fm.setProcessing(processing);
 			fm.setFilePath(f.getCanonicalPath());
 
