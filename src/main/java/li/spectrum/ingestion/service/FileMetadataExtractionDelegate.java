@@ -1,7 +1,6 @@
 package li.spectrum.ingestion.service;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
@@ -13,10 +12,10 @@ import org.springframework.util.Assert;
 import li.spectrum.data.dbclient.FileModelService;
 import li.spectrum.data.model.File;
 import li.spectrum.data.model.FileModel;
-import li.spectrum.data.model.Folder;
-import li.spectrum.data.model.Metadata;
 import li.spectrum.data.model.Processing;
 import li.spectrum.data.model.Record;
+import li.spectrum.data.model.builder.FileBuilder;
+import li.spectrum.data.model.builder.FileModelBuilder;
 
 /**
  * {@code FileMetadataExtractionDelegate} is a Java task responsible for
@@ -50,26 +49,20 @@ public class FileMetadataExtractionDelegate implements JavaDelegate {
 		Assert.notNull(procId, "'parentProcessId' must not be null");
 		Assert.notNull(fileRecord, "'fileRecord' must not be null");
 
-		Path path = Paths.get(fileRecord.getValue());
-		File file = null;
-		if (path.toFile().isDirectory()) {
-			file = new Folder(path.toString());
-		} else {
-			file = new File(path.toString());
+		File file;
+		FileModel fm;
+		try {
+			Processing processing = new Processing();
+			processing.setTaskName(this.getClass().getSimpleName());
+
+			file = new FileBuilder().setFilePath(fileRecord.getValue()).build();
+			fm = new FileModelBuilder().setFile(file).setProcessing(processing).build();
+
+			this.fileModelService.addOrUpdate(fm);
+
+		} catch (IOException e) {
+			logger.error("Error building File {}", e);
 		}
-		file.setName(path.getFileName().toString());
-		Metadata meta = file.get_metadata();
-		meta.setType(file.getClass().getSimpleName());
-		meta.setUri(file.getCanonicalPath());
-
-		Processing processing = new Processing();
-		processing.setTaskName(this.getClass().getSimpleName());
-
-		FileModel fm = new FileModel();
-		fm.setFile(file);
-		fm.setProcessing(processing);
-		fm.setFilePath(file.getCanonicalPath());
-		this.fileModelService.addOrUpdate(fm);
 
 		execution.setVariable("status", "OK");
 	}
