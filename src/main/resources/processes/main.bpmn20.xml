@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+	typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+	targetNamespace="http://www.activiti.org/bpmn2.0">
+
+	<process id="main" name="MainProcess" isExecutable="true">
+
+		<startEvent id="startMain" name="Start" activiti:initiator="initiator"></startEvent>
+
+		<sequenceFlow id="flow1" sourceRef="startMain"
+			targetRef="listFileUnderDirectory"></sequenceFlow>
+
+		<serviceTask id="listFileUnderDirectory"
+			name="Delegate to list all files under a directory"
+			activiti:delegateExpression="#{listFile}">
+
+		</serviceTask>
+
+		<sequenceFlow id="flow2" sourceRef="listFileUnderDirectory"
+			targetRef="callFileProcess" />
+
+		<callActivity id="callFileProcess" name="Calls File Process"
+			calledElement="fileProcess">
+			<extensionElements>
+				<activiti:in source="processId" target="parentProcessId" />
+				<activiti:in source="file" target="fileRecord" />
+			</extensionElements>
+			
+			<multiInstanceLoopCharacteristics
+				isSequential="true" activiti:collection="${listFile.getFilesToProcess()}"
+				activiti:elementVariable="file">
+			</multiInstanceLoopCharacteristics>
+
+		</callActivity>
+
+		<sequenceFlow id="flow3" sourceRef="callFileProcess"
+			targetRef="theEnd" />
+
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

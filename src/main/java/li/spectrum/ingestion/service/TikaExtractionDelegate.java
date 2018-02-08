@@ -1,9 +1,10 @@
 package li.spectrum.ingestion.service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.nio.file.Paths;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
@@ -14,15 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import li.spectrum.data.dbclient.FileModelService;
-import li.spectrum.data.dbclient.ProcessService;
-import li.spectrum.data.model.File;
 import li.spectrum.data.model.FileModel;
-import li.spectrum.data.model.Metadata;
-import li.spectrum.data.model.Proc;
 import li.spectrum.data.model.Processing;
+import li.spectrum.data.model.Record;
 import li.spectrum.data.model.TikaModel;
 import li.spectrum.ingestion.tika.TikaExtractor;
-import li.spectrum.ingestion.tika.TikaParser;
 
 /**
  * {@code TikaExtractionDelegate} is a Java task responsible for extracting tika
@@ -32,81 +29,65 @@ public class TikaExtractionDelegate implements JavaDelegate {
 
 	private static Logger logger = LoggerFactory.getLogger(TikaExtractionDelegate.class);
 
-	private volatile ProcessService processService;
-
 	private volatile FileModelService fileModelService;
 
 	private volatile TikaExtractor tikaExtractor;
 
 	/**
-	 * Will construct this instance using provided {@link ProcessService} and
-	 * {@link TikaParser}
+	 * Will construct this instance using provided {@link FileModelService} and
+	 * {@link TikaExtractor}
 	 *
-	 * @param processService
-	 *            The process service.
 	 * @param fileModelService
 	 *            The file model service.
 	 * @param tikaExtractor
 	 *            The tika extractor.
 	 */
 	@Autowired
-	public TikaExtractionDelegate(ProcessService processService, FileModelService fileModelService,
+	public TikaExtractionDelegate(FileModelService fileModelService,
 			TikaExtractor tikaExtractor) {
-		Assert.notNull(processService, "'processService' must not be null");
 		Assert.notNull(fileModelService, "'fileModelService' must not be null");
 		Assert.notNull(tikaExtractor, "'tikaExtractor' must not be null");
-		this.processService = processService;
 		this.fileModelService = fileModelService;
 		this.tikaExtractor = tikaExtractor;
 	}
 
 	@Override
 	public void execute(DelegateExecution execution) {
-		String procId = (String) execution.getVariable("processId");
-		logger.debug("Continuing process: [" + procId + "]");
+		String procId = (String) execution.getVariable("parentProcessId");
+		logger.debug("Continuing file process with parent: [" + procId + "]");
 
-		Proc proc = processService.get(procId);
-		List<File> files = proc.getFiles();
-		java.io.File file = null;
+		Record fileRecord = (Record) execution.getVariable("fileRecord");
+		logger.debug("extracting file: " + fileRecord.getValue());
+
+		Assert.notNull(procId, "'parentProcessId' must not be null");
+		Assert.notNull(fileRecord, "'fileRecord' must not be null");
+
+		String filePath = fileRecord.getValue();
+		FileModel fm = this.fileModelService.get(filePath);
+		Processing processing = new Processing();
+		processing.setTaskName(this.getClass().getSimpleName());
+		fm.setProcessing(processing);
+
 		TikaModel tika = null;
-		Processing processing = null;
-		for (File f : files) {
-			processing = new Processing();
-			processing.setTaskName(this.getClass().getSimpleName());
-
-			Metadata meta = f.get_metadata();
-			meta.setType(f.getClass().getSimpleName());
-			meta.setUri(f.getCanonicalPath());
-
-			FileModel fm = new FileModel();
-			fm.setFile(f);
-			fm.setProcessing(processing);
-			fm.setFilePath(f.getCanonicalPath());
-
-			InputStream targetStream = null;
-			file = new java.io.File(f.getCanonicalPath());
-			if (file.isFile()) {
-				try {
-					targetStream = new FileInputStream(file);
-					tika = this.tikaExtractor.extract(targetStream);
-					if (targetStream != null) {
-						targetStream.close();
-					}
-					processing.setStatus("OK");
-				} catch (TikaException | IOException e) {
-					logger.error("Error extracting file {}, skipping it.", f);
-					processing.setException(e);
-					processing.setStatus("WARN");
+		InputStream targetStream = null;
+		File file = Paths.get(fileRecord.getValue()).toFile();
+		if (file.isFile()) {
+			try {
+				targetStream = new FileInputStream(file);
+				tika = this.tikaExtractor.extract(targetStream);
+				if (targetStream != null) {
+					targetStream.close();
 				}
 				logger.debug("Tika extracted: [" + tika.getMetadata() + "]");
-				fm.setTikaModel(tika);
-
+				processing.setStatus("OK");
+			} catch (TikaException | IOException e) {
+				logger.error("Error extracting file {}, skipping it.", filePath);
+				processing.setException(e);
+				processing.setStatus("WARN");
 			}
-
-			this.fileModelService.add(fm);
-
+			fm.setTikaModel(tika);
 		}
-
+		this.fileModelService.addOrUpdate(fm);
 	}
 
 }

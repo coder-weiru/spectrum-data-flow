@@ -17,6 +17,7 @@ import li.spectrum.data.dbclient.MarkLogicDocumentService;
 import li.spectrum.data.dbclient.MarkLogicFileModelService;
 import li.spectrum.data.dbclient.MarkLogicProcessService;
 import li.spectrum.data.dbclient.ProcessService;
+import li.spectrum.ingestion.service.FileMetadataExtractionDelegate;
 import li.spectrum.ingestion.service.ListFileDelegate;
 import li.spectrum.ingestion.service.TikaExtractionDelegate;
 import li.spectrum.ingestion.tika.TikaExtractor;
@@ -44,7 +45,12 @@ public class AppConfig {
 
 	@Bean
 	TikaExtractionDelegate tika() throws TikaException {
-		return new TikaExtractionDelegate(processService(), fileModelService(), tikaExtractor());
+		return new TikaExtractionDelegate(fileModelService(), tikaExtractor());
+	}
+
+	@Bean
+	FileMetadataExtractionDelegate fileMeta() {
+		return new FileMetadataExtractionDelegate(fileModelService());
 	}
 
 	@Bean
