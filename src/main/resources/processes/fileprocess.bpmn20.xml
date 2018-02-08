@@ -13,14 +13,14 @@
 			targetRef="extractFile"></sequenceFlow>
 
 
-		<serviceTask id="extractFile" name="extractFile"
+		<serviceTask id="extractFile" name="File Metadata Extractor"
 			activiti:delegateExpression="#{fileMeta}" />
 
 		<sequenceFlow id="flow2" sourceRef="extractFile"
 			targetRef="extractTikaEntities" />
 
 		<serviceTask id="extractTikaEntities"
-			name="Delegate to extract the file metadata using tika extractor library"
+			name="Tika Extractor"
 			activiti:delegateExpression="#{tika}" />
 
 		<sequenceFlow id="flow3" sourceRef="extractTikaEntities"

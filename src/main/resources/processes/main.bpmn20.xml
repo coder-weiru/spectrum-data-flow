@@ -12,7 +12,7 @@
 			targetRef="listFileUnderDirectory"></sequenceFlow>
 
 		<serviceTask id="listFileUnderDirectory"
-			name="Delegate to list all files under a directory"
+			name="List File Under Directory"
 			activiti:delegateExpression="#{listFile}">
 
 		</serviceTask>
